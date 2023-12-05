@@ -1,0 +1,223 @@
+SQL Questions Attempted on Leet Code
+
+1-
+https://leetcode.com/problems/rank-scores/submissions/
+
+Write an SQL query to rank the scores. The ranking should be calculated according to the following rules:
+
+The scores should be ranked from the highest to the lowest.
+If there is a tie between two scores, both should have the same ranking.
+After a tie, the next ranking number should be the next consecutive integer value. In other words, there should be no holes between ranks.
+Return the result table ordered by score in descending order.
+
+The query result format is in the following example.
+
+
+Answer
+
+SELECT score, DENSE_RANK() 
+OVER (order by score desc ) 
+AS 'rank' FROM Scores;
+
+
+
+2-
+
+https://leetcode.com/problems/delete-duplicate-emails/
+
+Remove Duplicate rows
+
+Write an SQL query to delete all the duplicate emails, keeping only one unique email with the smallest id. Note that you are supposed to write a DELETE statement and not a SELECT one.
+
+After running your script, the answer shown is the Person table. The driver will first compile and run your piece of code and then show the Person table. The final order of the Person table does not matter.
+
+The query result format is in the following example.
+
+Answer
+
+Delete from person where id not in
+(Select min(id) from Person 
+group by email)
+
+3-
+
+https://leetcode.com/problems/duplicate-emails/
+
+Write an SQL query to report all the duplicate emails.
+Return the result table in any order
+
+select email from Person
+group by email
+having count(email)>1
+
+4-
+https://leetcode.com/problems/not-boring-movies/
+
+Write an SQL query to report the movies with an odd-numbered ID and a description that is not "boring".
+Return the result table ordered by rating in descending order.
+
+Answer
+
+select * from Cinema 
+where mod(id,2)!=0 and 
+description!='boring'
+order by rating desc
+
+5-
+https://leetcode.com/problems/rising-temperature/
+
+Write an SQL query to find all dates' Id with higher temperatures compared to its previous dates (yesterday).
+Return the result table in any order.
+
+Select w2.id 
+from Weather w1 ,Weather w2
+where (w2.recordDate-w1.recordDate)=1 
+and w2.temperature>w1.temperature
+
+6-
+https://leetcode.com/problems/classes-more-than-5-students/
+
+Write an SQL query to report all the classes that have at least five students.
+Return the result table in any order.
+
+select class from Courses
+group by class 
+having count(class)>=5
+
+7-
+https://leetcode.com/problems/article-views-i/
+
+Write an SQL query to find all the authors that viewed at least one of their own articles.
+Return the result table sorted by id in ascending order.
+The query result format is in the following example.
+
+select distinct author_id as id from Views
+where author_id=viewer_id
+order by 1;
+
+8-
+https://leetcode.com/problems/customer-placing-the-largest-number-of-orders/
+
+Write an SQL query to find the customer_number for the customer who has placed the largest number of orders.
+The test cases are generated so that exactly one customer will have placed more orders than any other customer.
+The query result format is in the following example.
+
+select customer_number
+from Orders 
+group by customer_number
+order by count(customer_number) desc 
+limit 1;
+
+9-
+https://leetcode.com/problems/swap-salary/
+
+Write an SQL query to swap all 'f' and 'm' values (i.e., change all 'f' values to 'm' and vice versa) with a single update statement and no intermediate temporary tables.
+Note that you must write a single update statement, do not write any select statement for this problem.
+The query result format is in the following example.
+
+
+UPDATE Salary SET sex = CASE
+    WHEN sex = 'f' THEN 'm'
+    ELSE 'f'
+    END
+
+ 
+
+10-
+https://leetcode.com/problems/fix-names-in-a-table/
+
+Write an SQL query to fix the names so that only the first character is uppercase and the rest are lowercase.
+Return the result table ordered by user_id.
+The query result format is in the following example.
+
+SELECT user_id, 
+CONCAT(UPPER(SUBSTRING(name, 1, 1)) ,LOWER(SUBSTRING(name, 2, LENGTH(name)-1)) ) AS name
+from Users
+order by user_id;
+
+11-
+https://leetcode.com/problems/market-analysis-i/submissions/
+
+select o.buyer_id, u.join_date ,count(o.buyer_id) as orders_in_2019
+from Users u
+join Orders o
+on (u.user_id=o.buyer_id)
+where YEAR(o.order_date)=2019
+group by o.buyer_id 
+UNION
+select user_id,join_date ,0 as orders_in_2019 
+from Users
+where user_id NOT IN
+(select distinct o.buyer_id
+from Users u1
+join Orders o
+on (u1.user_id=o.buyer_id)
+where YEAR(o.order_date)=2019);
+
+12-
+https://leetcode.com/problems/department-top-three-salaries/
+
+A company's executives are interested in seeing who earns the most money in each of the company's departments. A high earner in a department is an employee who has a salary in the top three unique salaries for that department.
+Write an SQL query to find the employees who are high earners in each of the departments.
+Return the result table in any order.
+
+select t.Department, t.Employee, t.Salary from
+(select d.name as Department , e.name as Employee , e.Salary as Salary,DENSE_RANK () OVER ( 
+			PARTITION BY d.name
+			ORDER BY e.Salary DESC
+		) price_rank 
+ from Employee e
+join Department d
+on e.departmentId=d.id) t
+where t.price_rank<=3;
+
+13-
+
+https://leetcode.com/problems/game-play-analysis-i/
+
+Write an SQL query to report the first login date for each player.
+Return the result table in any order.
+The query result format is in the following example.
+
+Select player_id , min(event_date) as first_login
+from Activity
+group by player_id;
+
+14-
+https://leetcode.com/problems/user-activity-for-the-past-30-days-i/
+
+
+Write an SQL query to find the daily active user count for a period of 30 days ending 2019-07-27 inclusively. A user was active on someday if they made at least one activity on that day.
+Return the result table in any order.
+The query result format is in the following example.
+
+select DATE(activity_date) as day , count(distinct user_id) as  active_users
+from Activity
+where activity_date between DATE('2019-06-28') and DATE('2019-07-27')
+group by activity_date;
+
+15-
+https://leetcode.com/problems/daily-leads-and-partners/submissions/
+
+Write an SQL query that will, for each date_id and make_name, return the number of distinct lead_id's and distinct partner_id's.
+Return the result table in any order.
+The query result format is in the following example.
+
+select date_id,make_name , count(distinct(lead_id)) as unique_leads , count(distinct(partner_id)) as unique_partners
+from DailySales
+group by date_id,make_name
+
+16-
+https://leetcode.com/problems/sales-analysis-iii/submissions/
+
+Write an SQL query that reports the products that were only sold in the first quarter of 2019. That is, between 2019-01-01 and 2019-03-31 inclusive.
+Return the result table in any order.
+
+select p.product_id, p.product_name
+from Product p
+join Sales s
+on p.product_id=s.product_id
+where sale_date between '2019-01-01' and '2019-03-31'
+and s.product_id NOT IN (select product_id from Sales where sale_date<'2019-01-01' or sale_date>'2019-03-31'  )
+group by p.product_id, p.product_name 
+
